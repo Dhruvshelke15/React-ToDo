@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import Todo from './Todo';
+import { db } from './firebase';
+import {
+  query,
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc,
+  addDoc,
+  deleteDoc,
+} from 'firebase/firestore';
 
 const style = {
-  bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#2f80ed] to-[#1cb5e0]`,
+  bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]`,
   container: `bg-slate-100 max-w-[500px] w-full m-auto rounded-md shadow-xl p-4`,
   heading: `text-3xl font-bold text-center text-gray-800 p-2`,
   form: `flex justify-between`,
@@ -29,6 +39,18 @@ function App() {
     setInput('');
   };
 
+  useEffect(() => {
+    const q = query(collection(db, 'todos'));
+    const unsubscribe = onSnapshot(q, querySnapshot => {
+      let todosArr = [];
+      querySnapshot.forEach(doc => {
+        todosArr.push({ ...doc.data(), id: doc.id });
+      });
+      setTodos(todosArr);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const toggleComplete = async todo => {
     await updateDoc(doc(db, 'todos', todo.id), {
       completed: !todo.completed,
@@ -42,7 +64,7 @@ function App() {
   return (
     <div className={style.bg}>
       <div className={style.container}>
-        <h3 className={style.heading}>To Do App</h3>
+        <h3 className={style.heading}>Todo App</h3>
         <form onSubmit={createTodo} className={style.form}>
           <input
             value={input}
