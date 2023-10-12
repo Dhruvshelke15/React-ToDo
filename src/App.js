@@ -16,6 +16,19 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
 
+  const createTodo = async e => {
+    e.preventDefault(e);
+    if (input === '') {
+      alert('Please enter a valid todo');
+      return;
+    }
+    await addDoc(collection(db, 'todos'), {
+      text: input,
+      completed: false,
+    });
+    setInput('');
+  };
+
   const toggleComplete = async todo => {
     await updateDoc(doc(db, 'todos', todo.id), {
       completed: !todo.completed,
@@ -30,7 +43,7 @@ function App() {
     <div className={style.bg}>
       <div className={style.container}>
         <h3 className={style.heading}>To Do App</h3>
-        <form onSubmit="" className={style.form}>
+        <form onSubmit={createTodo} className={style.form}>
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
