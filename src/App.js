@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
+import Todo from './Todo';
 
 const style = {
   bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#2f80ed] to-[#1cb5e0]`,
@@ -14,6 +15,16 @@ const style = {
 function App() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
+
+  const toggleComplete = async todo => {
+    await updateDoc(doc(db, 'todos', todo.id), {
+      completed: !todo.completed,
+    });
+  };
+
+  const deleteTodo = async id => {
+    await deleteDoc(doc(db, 'todos', id));
+  };
 
   return (
     <div className={style.bg}>
@@ -31,6 +42,19 @@ function App() {
             <AiOutlinePlus size={30} />
           </button>
         </form>
+        <ul>
+          {todos.map((todo, index) => (
+            <Todo
+              key={index}
+              todo={todo}
+              toggleComplete={toggleComplete}
+              deleteTodo={deleteTodo}
+            />
+          ))}
+        </ul>
+        {todos.length < 1 ? null : (
+          <p className={style.count}>{`You have ${todos.length} todos`}</p>
+        )}
       </div>
     </div>
   );
